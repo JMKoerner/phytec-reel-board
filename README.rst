@@ -66,7 +66,7 @@ Schritte notwendig:
 Die Original-Software (Master) stammt von
 https://github.com/zephyrproject-rtos/zephyr/tree/master/samples/boards/reel_board/mesh_badge
 
-Um diese für das "reel board", auch in der Deutschen Version kompiliernen zu können,
+Um diese für das "reel board", auch in der Deutschen Version kompilieren zu können,
 benötigen Sie die ZEPHYR Entwicklungsumgebung. Weitere Infos hierzu finden Sie unter 
 https://docs.zephyrproject.org/latest/boards/arm/reel_board/doc/reel_board.html
 
