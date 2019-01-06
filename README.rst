@@ -17,7 +17,7 @@ Anwendung der Software erfolgt auf eigenem Risiko.
 
 
 Diese Applikation für das "reel board" zeigt beispielhaft das Bluetooth 
-untereinander Verbinden (meshen).
+Untereinanderverbinden (meshen).
 
 Diese App wurde ursprünglich als eine Bluetooth GATT Anwendung entwickelt.
 Installieren Sie die "nRF Connect" App auf Ihr Smartphone (verfügbar 
