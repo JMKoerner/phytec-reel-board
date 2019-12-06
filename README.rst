@@ -46,7 +46,7 @@ Bedienung
 #. Wenn das Pairing erfolgt ist, wird der gesendete Text angezeigt. Wenn Sie
    noch etwas am Text ändern wollen, können Sie dieses nun tun.
 #. Wenn alles ok ist, trennen das Board (beenden Sie die App oder gehen
-   Sie auf die Scann Seite ihres Phones.
+   Sie auf die Scan Seite ihres Phones.
 #. Einmal getrennt, schaltet das Board in den Bluetooth Mesh Mode. Von da an
    kann man das Board nicht mehr über GATT angesprechen.
    
