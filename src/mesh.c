@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  *
- * Ãnderung: Deutsche ePapier-Teckte und Anzeige des eigenen Namens bei BetÃ¤tigen des User-Knopfes: JK LUG-Noris 01/2019
+ * Aenderung: Deutsche ePapier-Texte und Anzeige des eigenen Namens bei Betaetigen des User-Knopfes: JK LUG-Noris 01/2019
  */
 
 #include <zephyr.h>
