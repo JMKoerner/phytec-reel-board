@@ -34,8 +34,12 @@ struct led_onoff_state {
 };
 
 void mesh_send_hello(void);
+void mesh_send_baduser(void);
 
 u16_t mesh_get_addr(void);
 bool mesh_is_initialized(void);
 void mesh_start(void);
 int mesh_init(void);
+
+int bt_mesh_suspend(void);
+int bt_mesh_resume(void);

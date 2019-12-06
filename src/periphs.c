@@ -5,9 +5,12 @@
  */
 
 #include <zephyr.h>
-#include <gpio.h>
-#include <sensor.h>
+#include <drivers/gpio.h>
+#include <drivers/sensor.h>
 #include "board.h"
+#include "mesh.h"
+
+#include <bluetooth/mesh.h>
 
 struct device_info {
 	struct device *dev;
@@ -21,18 +24,20 @@ struct led_device_info {
 };
 
 static struct led_device_info led_dev_info[] = {
-	{ NULL, LED0_GPIO_CONTROLLER, LED0_GPIO_PIN }, /* green back LED */
-	{ NULL, LED1_GPIO_CONTROLLER, LED1_GPIO_PIN }, /* red front LED */
-	{ NULL, LED2_GPIO_CONTROLLER, LED2_GPIO_PIN }, /* green front LED */
-	{ NULL, LED3_GPIO_CONTROLLER, LED3_GPIO_PIN }, /* blue front LED */
+	/* red front LED */
+	{ NULL, DT_ALIAS_LED0_GPIOS_CONTROLLER, DT_ALIAS_LED0_GPIOS_PIN },
+	/* green front LED */
+	{ NULL, DT_ALIAS_LED1_GPIOS_CONTROLLER, DT_ALIAS_LED1_GPIOS_PIN },
+	/* blue front LED */
+	{ NULL, DT_ALIAS_LED2_GPIOS_CONTROLLER, DT_ALIAS_LED2_GPIOS_PIN },
 };
 
 static struct device_info dev_info[] = {
-	{ NULL, SW0_GPIO_CONTROLLER },
-	{ NULL, DT_HDC1008_NAME },
-	{ NULL, DT_FXOS8700_NAME },
-	{ NULL, DT_APDS9960_DRV_NAME },
-	{ NULL, DT_SSD1673_DEV_NAME },
+	{ NULL, DT_ALIAS_SW0_GPIOS_CONTROLLER },
+	{ NULL, DT_INST_0_TI_HDC1010_LABEL },
+	{ NULL, DT_INST_0_NXP_MMA8652FC_LABEL },
+	{ NULL, DT_INST_0_AVAGO_APDS9960_LABEL },
+	{ NULL, DT_INST_0_SOLOMON_SSD16XXFB_LABEL },
 };
 
 static void configure_gpios(void)
@@ -51,11 +56,6 @@ static void configure_gpios(void)
 			   led_dev_info[DEV_IDX_LED2].pin, GPIO_DIR_OUT);
 	gpio_pin_write(led_dev_info[DEV_IDX_LED2].dev,
 		       led_dev_info[DEV_IDX_LED2].pin, 1);
-
-	gpio_pin_configure(led_dev_info[DEV_IDX_LED3].dev,
-			   led_dev_info[DEV_IDX_LED3].pin, GPIO_DIR_OUT);
-	gpio_pin_write(led_dev_info[DEV_IDX_LED3].dev,
-		       led_dev_info[DEV_IDX_LED3].pin, 1);
 }
 
 int set_led_state(u8_t id, bool state)
@@ -123,6 +123,69 @@ int get_apds9960_val(struct sensor_value *val)
 	return 0;
 }
 
+#define MOTION_TIMEOUT K_MINUTES(10)
+
+static struct k_delayed_work motion_work;
+
+// static void bt_mesh_suspend(void);
+// static void bt_mesh_resume(void);
+
+
+static void motion_timeout(struct k_work *work)
+{
+	int err;
+
+	printk("power save\n");
+
+	if (!mesh_is_initialized()) {
+		k_delayed_work_submit(&motion_work, MOTION_TIMEOUT);
+		return;
+	}
+
+	err = bt_mesh_suspend();
+	if (err && err != -EALREADY) {
+		printk("failed to suspend mesh (err %d)\n", err);
+	}
+}
+
+static void motion_handler(struct device *dev, struct sensor_trigger *trig)
+{
+	int err;
+
+	printk("motion!\n");
+
+	if (!mesh_is_initialized()) {
+		return;
+	}
+
+	err = bt_mesh_resume();
+	if (err && err != -EALREADY) {
+		printk("failed to resume mesh (err %d)\n", err);
+	}
+
+	k_delayed_work_submit(&motion_work, MOTION_TIMEOUT);
+}
+
+static void configure_accel(void)
+{
+	struct device_info *accel = &dev_info[DEV_IDX_MMA8652];
+	struct sensor_trigger trig_motion = {
+		.type = SENSOR_TRIG_DELTA,
+		.chan = SENSOR_CHAN_ACCEL_XYZ,
+	};
+	int err;
+
+	err = sensor_trigger_set(accel->dev, &trig_motion, motion_handler);
+	if (err) {
+		printk("setting motion trigger failed, err %d\n", err);
+		return;
+	}
+
+
+	k_delayed_work_init(&motion_work, motion_timeout);
+	k_delayed_work_submit(&motion_work, MOTION_TIMEOUT);
+}
+
 int periphs_init(void)
 {
 	unsigned int i;
@@ -147,5 +210,8 @@ int periphs_init(void)
 	}
 
 	configure_gpios();
+
+	configure_accel();
+
 	return 0;
 }

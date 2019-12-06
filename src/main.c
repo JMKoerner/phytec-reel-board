@@ -2,10 +2,12 @@
  * Copyright (c) 2018 Intel Corporation
  *
  * SPDX-License-Identifier: Apache-2.0
+ *
+ * Änderung: Deutsche Texte auf ePapier: JK LUG Noris 01/2019
  */
 
 #include <zephyr.h>
-#include <misc/printk.h>
+#include <sys/printk.h>
 
 #include <string.h>
 
@@ -13,7 +15,7 @@
 
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/gatt.h>
-#include <sensor.h>
+#include <drivers/sensor.h>
 
 #include "mesh.h"
 #include "board.h"
@@ -74,7 +76,7 @@ static const struct bt_gatt_cpf name_cpf = {
 };
 
 /* Vendor Primary Service Declaration */
-static struct bt_gatt_attr name_attrs[] = {
+BT_GATT_SERVICE_DEFINE(name_svc,
 	/* Vendor Primary Service Declaration */
 	BT_GATT_PRIMARY_SERVICE(&name_uuid),
 	BT_GATT_CHARACTERISTIC(&name_enc_uuid.uuid,
@@ -83,9 +85,9 @@ static struct bt_gatt_attr name_attrs[] = {
 			       read_name, write_name, NULL),
 	BT_GATT_CUD("Badge Name", BT_GATT_PERM_READ),
 	BT_GATT_CPF(&name_cpf),
-};
+);
 
-static struct bt_gatt_service name_svc = BT_GATT_SERVICE(name_attrs);
+//static struct bt_gatt_service name_svc = BT_GATT_SERVICE(name_attrs);
 
 static void passkey_display(struct bt_conn *conn, unsigned int passkey)
 {
@@ -108,9 +110,9 @@ static void pairing_complete(struct bt_conn *conn, bool bonded)
 	board_show_text("Pairing Komplett", false, K_SECONDS(2));
 }
 
-static void pairing_failed(struct bt_conn *conn)
+static void pairing_failed(struct bt_conn *conn, enum bt_security_err reason)
 {
-	printk("Pairing Fehler\n");
+	printk("Pairing Fehler (%d)\n", reason);
 	board_show_text("Pairing Fehler", false, K_SECONDS(2));
 }
 
@@ -160,6 +162,7 @@ static void bt_ready(int err)
 
 	printk("Bluetooth initialisiert\n");
 
+
 	err = mesh_init();
 	if (err) {
 		printk("Mesh Initialisierungsfehler (err %d)\n", err);
@@ -171,11 +174,10 @@ static void bt_ready(int err)
 	bt_conn_cb_register(&conn_cb);
 	bt_conn_auth_cb_register(&auth_cb);
 
-	bt_gatt_service_register(&name_svc);
-
 	if (IS_ENABLED(CONFIG_SETTINGS)) {
 		settings_load();
 	}
+
 
 	if (!mesh_is_initialized()) {
 		/* Start advertising */

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8.2)
 include($ENV{ZEPHYR_BASE}/cmake/app/boilerplate.cmake NO_POLICY_SCOPE)
-project(mesh_badge_de)
-
-target_sources(app PRIVATE src/main.c src/mesh.c src/periphs.c src/${BOARD}.c)
+project(mesh_badge_de_V2)
+FILE(GLOB app_sources src/*.c)
+target_sources(app PRIVATE ${app_sources})

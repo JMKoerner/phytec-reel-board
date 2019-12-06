@@ -1,23 +1,24 @@
 .. _mesh_badge:
 
-Mesh Badge DE
-#############
+Mesh Badge DE V2 
+################
 
 Deutsch - Übersicht
 *******************
 
-Dies ist die deutsche Version für die Anwendung "mesh_badge" für das
-Phytec "reel board". Die Texte für das ePaper sind ins Deutsche 
-übersetzt, die Debug-Infos nur teilweise. Die Funktion Meshen wurde 
-geringfügig erweitert. Anstelle "Saying HI to everyone" erfolgt nun
-mit eingefügtem Sendername "<Name> sagt "Hallo" zu Jedem!".
+Dies ist die deutsche nunn überarbeitete Version 2 für die Anwendung 
+"mesh_badge" für das Phytec "reel board" und die Zephyr SDK 2.1.0 rc3. 
+Die Texte für das ePaper sind ins Deutsche  übersetzt, die Debug-Infos 
+nur teilweise. Die Funktion Meshen wurde geringfügig erweitert. Anstelle 
+"Saying HI to everyone" erfolgt nun mit eingefügtem Sendername 
+"<Name> sagt "Hallo" zu Jedem!".
 
 Das Projekt hat Beta-Status und ist so anzunehmen wie es ist. Die 
 Anwendung der Software erfolgt auf eigenem Risiko.
 
 
 Diese Applikation für das "reel board" zeigt beispielhaft das Bluetooth 
-Untereinanderverbinden (meshen).
+untereinander Verbinden (meshen).
 
 Diese App wurde ursprünglich als eine Bluetooth GATT Anwendung entwickelt.
 Installieren Sie die "nRF Connect" App auf Ihr Smartphone (verfügbar 
@@ -59,14 +60,14 @@ Schritte notwendig:
 
 #. Beim Einschalten den "User"-Knopf gedrückt halten (oder gemeinsam mit dem
    "Reset"-Knopf falls eingeschaltet).
-#. Warten, bis "Reseting Device" angezeigt wird.
+#. Warten, bis "Geraet ruecksetzen" angezeigt wird.
 
 
 
 Die Original-Software (Master) stammt von
 https://github.com/zephyrproject-rtos/zephyr/tree/master/samples/boards/reel_board/mesh_badge
 
-Um diese für das "reel board", auch in der Deutschen Version kompilieren zu können,
+Um diese für das "reel board", auch in der Deutschen Version kompiliernen zu können,
 benötigen Sie die ZEPHYR Entwicklungsumgebung. Weitere Infos hierzu finden Sie unter 
 https://docs.zephyrproject.org/latest/boards/arm/reel_board/doc/reel_board.html
 

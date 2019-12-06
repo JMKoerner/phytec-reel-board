@@ -3,15 +3,17 @@
  * Copyright (c) 2018 Intel Corporation
  *
  * SPDX-License-Identifier: Apache-2.0
+ *
+ * Ãnderung: Deutsche Texte auf ePapier: JK LUG-Noris 01/2019
  */
 
 #include <zephyr.h>
 #include <device.h>
-#include <gpio.h>
+#include <drivers/gpio.h>
 #include <display/cfb.h>
-#include <misc/printk.h>
-#include <flash.h>
-#include <sensor.h>
+#include <sys/printk.h>
+#include <drivers/flash.h>
+#include <drivers/sensor.h>
 
 #include <string.h>
 #include <stdio.h>
@@ -23,9 +25,9 @@
 #include "board.h"
 
 enum font_size {
-	FONT_BIG = 0,
+	FONT_BIG = 2,
 	FONT_MEDIUM = 1,
-	FONT_SMALL = 2,
+	FONT_SMALL = 0,
 };
 
 enum screen_ids {
@@ -49,8 +51,8 @@ struct font_info {
 
 #define EDGE (GPIO_INT_EDGE | GPIO_INT_DOUBLE_EDGE)
 
-#ifdef SW0_GPIO_FLAGS
-#define PULL_UP SW0_GPIO_FLAGS
+#ifdef DT_ALIAS_SW0_GPIOS_FLAGS
+#define PULL_UP DT_ALIAS_SW0_GPIOS_FLAGS
 #else
 #define PULL_UP 0
 #endif
@@ -68,10 +70,9 @@ static struct {
 	const char *name;
 	u32_t pin;
 } leds[] = {
-	{ .name = LED0_GPIO_CONTROLLER, .pin = LED0_GPIO_PIN, },
-	{ .name = LED1_GPIO_CONTROLLER, .pin = LED1_GPIO_PIN, },
-	{ .name = LED2_GPIO_CONTROLLER, .pin = LED2_GPIO_PIN, },
-	{ .name = LED3_GPIO_CONTROLLER, .pin = LED3_GPIO_PIN, },
+	{ .name = DT_ALIAS_LED0_GPIOS_CONTROLLER, .pin = DT_ALIAS_LED0_GPIOS_PIN, },
+	{ .name = DT_ALIAS_LED1_GPIOS_CONTROLLER, .pin = DT_ALIAS_LED1_GPIOS_PIN, },
+	{ .name = DT_ALIAS_LED2_GPIOS_CONTROLLER, .pin = DT_ALIAS_LED2_GPIOS_PIN, },
 };
 
 struct k_delayed_work led_timer;
@@ -85,12 +86,12 @@ static size_t print_line(enum font_size font_size, int row, const char *text,
 
 	cfb_framebuffer_set_font(epd_dev, font_size);
 
-	len = min(len, fonts[font_size].columns);
+	len = MIN(len, fonts[font_size].columns);
 	memcpy(line, text, len);
 	line[len] = '\0';
 
 	if (center) {
-		pad = (fonts[font_size].columns - len) / 2;
+		pad = (fonts[font_size].columns - len) / 2U;
 	} else {
 		pad = 0;
 	}
@@ -284,7 +285,7 @@ static void show_statistics(void)
 	print_line(FONT_SMALL, line++, str, len, false);
 
 	len = snprintk(str, sizeof(str),
-		       "Knotenzaehler:  %u", stat_count + 1);
+		       "Knotenzaehler : %u", stat_count + 1);
 	print_line(FONT_SMALL, line++, str, len, false);
 
 	/* Find the top sender */
@@ -356,11 +357,11 @@ static void show_sensors_data(s32_t interval)
 		goto _error_get;
 	}
 
-	len = snprintf(str_buf, sizeof(str_buf), "Temperatur:   %d.%d C\n",
+	len = snprintf(str_buf, sizeof(str_buf), "Temperatur    :  %d.%d C\n",
 		       val[0].val1, val[0].val2 / 100000);
 	print_line(FONT_SMALL, line++, str_buf, len, false);
 
-	len = snprintf(str_buf, sizeof(str_buf), "Feuchtigkeit: %d%%\n",
+	len = snprintf(str_buf, sizeof(str_buf), "Feuchtigkeit  :  %d%%\n",
 		       val[1].val1);
 	print_line(FONT_SMALL, line++, str_buf, len, false);
 
@@ -369,15 +370,15 @@ static void show_sensors_data(s32_t interval)
 		goto _error_get;
 	}
 
-	len = snprintf(str_buf, sizeof(str_buf), "AX :%10.3f\n",
+	len = snprintf(str_buf, sizeof(str_buf), "B-Sensor - AX :%7.3f\n",
 		       sensor_value_to_double(&val[0]));
 	print_line(FONT_SMALL, line++, str_buf, len, false);
 
-	len = snprintf(str_buf, sizeof(str_buf), "AY :%10.3f\n",
+	len = snprintf(str_buf, sizeof(str_buf), "         - AY :%7.3f\n",
 		       sensor_value_to_double(&val[1]));
 	print_line(FONT_SMALL, line++, str_buf, len, false);
 
-	len = snprintf(str_buf, sizeof(str_buf), "AZ :%10.3f\n",
+	len = snprintf(str_buf, sizeof(str_buf), "         - AZ :%7.3f\n",
 		       sensor_value_to_double(&val[2]));
 	print_line(FONT_SMALL, line++, str_buf, len, false);
 
@@ -386,9 +387,9 @@ static void show_sensors_data(s32_t interval)
 		goto _error_get;
 	}
 
-	len = snprintf(str_buf, sizeof(str_buf), "Lichtstaerke: %d\n", val[0].val1);
+	len = snprintf(str_buf, sizeof(str_buf), "Lichtstaerke  :  %d\n", val[0].val1);
 	print_line(FONT_SMALL, line++, str_buf, len, false);
-	len = snprintf(str_buf, sizeof(str_buf), "Abstand:      %d\n", val[1].val1);
+	len = snprintf(str_buf, sizeof(str_buf), "Abstand       :  %d\n", val[1].val1);
 	print_line(FONT_SMALL, line++, str_buf, len, false);
 
 	cfb_framebuffer_finalize(epd_dev);
@@ -447,7 +448,7 @@ static bool button_is_pressed(void)
 {
 	u32_t val;
 
-	gpio_pin_read(gpio, SW0_GPIO_PIN, &val);
+	gpio_pin_read(gpio, DT_ALIAS_SW0_GPIOS_PIN, &val);
 
 	return !val;
 }
@@ -479,8 +480,28 @@ static void button_interrupt(struct device *dev, struct gpio_callback *cb,
 	case SCREEN_STATS:
 		return;
 	case SCREEN_MAIN:
-		if (pins & BIT(SW0_GPIO_PIN)) {
-			mesh_send_hello();
+		if (pins & BIT(DT_ALIAS_SW0_GPIOS_PIN)) {
+			u32_t uptime = k_uptime_get_32();
+			static u32_t bad_count, press_ts;
+
+			if (uptime - press_ts < 500) {
+				bad_count++;
+			} else {
+				bad_count = 0U;
+			}
+
+			press_ts = uptime;
+
+			if (bad_count) {
+				if (bad_count > 5) {
+					mesh_send_baduser();
+					bad_count = 0U;
+				} else {
+					printk("Ignoring press\n");
+				}
+			} else {
+				mesh_send_hello();
+			}
 		}
 		return;
 	default:
@@ -492,18 +513,18 @@ static int configure_button(void)
 {
 	static struct gpio_callback button_cb;
 
-	gpio = device_get_binding(SW0_GPIO_CONTROLLER);
+	gpio = device_get_binding(DT_ALIAS_SW0_GPIOS_CONTROLLER);
 	if (!gpio) {
 		return -ENODEV;
 	}
 
-	gpio_pin_configure(gpio, SW0_GPIO_PIN,
+	gpio_pin_configure(gpio, DT_ALIAS_SW0_GPIOS_PIN,
 			   (GPIO_DIR_IN | GPIO_INT |  PULL_UP | EDGE));
 
-	gpio_init_callback(&button_cb, button_interrupt, BIT(SW0_GPIO_PIN));
+	gpio_init_callback(&button_cb, button_interrupt, BIT(DT_ALIAS_SW0_GPIOS_PIN));
 	gpio_add_callback(gpio, &button_cb);
 
-	gpio_pin_enable_callback(gpio, SW0_GPIO_PIN);
+	gpio_pin_enable_callback(gpio, DT_ALIAS_SW0_GPIOS_PIN);
 
 	return 0;
 }
@@ -557,8 +578,10 @@ static int erase_storage(void)
 
 	dev = device_get_binding(DT_FLASH_DEV_NAME);
 
-	return flash_erase(dev, FLASH_AREA_STORAGE_OFFSET,
-			   FLASH_AREA_STORAGE_SIZE);
+	flash_write_protection_set(dev, false);
+
+	return flash_erase(dev, DT_FLASH_AREA_STORAGE_OFFSET,
+			   DT_FLASH_AREA_STORAGE_SIZE);
 }
 
 void board_refresh_display(void)
@@ -568,9 +591,9 @@ void board_refresh_display(void)
 
 int board_init(void)
 {
-	epd_dev = device_get_binding(DT_SSD1673_DEV_NAME);
+	epd_dev = device_get_binding(DT_INST_0_SOLOMON_SSD16XXFB_LABEL);
 	if (epd_dev == NULL) {
-		printk("SSD1673 device not found\n");
+		printk("SSD16XX device not found\n");
 		return -ENODEV;
 	}
 
@@ -597,7 +620,7 @@ int board_init(void)
 	pressed = button_is_pressed();
 	if (pressed) {
 		printk("Erasing storage\n");
-		board_show_text("Resetting Device", false, K_SECONDS(4));
+		board_show_text("Geraet Ruecksetzen", false, K_SECONDS(4));
 		erase_storage();
 	}
 
