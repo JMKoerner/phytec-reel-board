@@ -6,7 +6,7 @@ Mesh Badge DE V2
 Deutsch - Übersicht
 *******************
 
-Dies ist die deutsche nunn überarbeitete Version 2 für die Anwendung 
+Dies ist nun die deutsche überarbeitete Version 2 für die Anwendung 
 "mesh_badge" für das Phytec "reel board" und die Zephyr SDK 2.1.0 rc3. 
 Die Texte für das ePaper sind ins Deutsche  übersetzt, die Debug-Infos 
 nur teilweise. Die Funktion Meshen wurde geringfügig erweitert. Anstelle 
@@ -14,7 +14,8 @@ nur teilweise. Die Funktion Meshen wurde geringfügig erweitert. Anstelle
 "<Name> sagt "Hallo" zu Jedem!".
 
 Das Projekt hat Beta-Status und ist so anzunehmen wie es ist. Die 
-Anwendung der Software erfolgt auf eigenem Risiko.
+Anwendung der Software erfolgt auf eigenem Risiko. Alle Anpassungen aus
+dem Hauptzweig sind bis Stand 5.12.2019 eingearbeitet.
 
 
 Diese Applikation für das "reel board" zeigt beispielhaft das Bluetooth 
